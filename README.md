@@ -1,6 +1,6 @@
 # California Housing Price Prediction — Few-Shot Prompt Engineering
 
-A prompt-engineering homework assignment that predicts California housing prices using **few-shot learning** with **Gemini 2.5 Flash**, instead of a trained ML model.
+A prompt-engineering assignment that predicts California housing prices using **few-shot learning** with **Gemini 3.5 Flash**, instead of a trained ML model.
 
 ## What This Project Does
 

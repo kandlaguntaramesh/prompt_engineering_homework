@@ -4,11 +4,15 @@ generate_few_shot_prompt.py
 Builds the few-shot prompt used to teach Gemini the relationship between
 California housing attributes and median_house_value.
 
-This preserves the exact few-shot logic from the original Colab notebook:
-  - few_shot_df = df.sample(n=70, random_state=42)
+Per the original assignment: randomly selects 60 to 70 rows to use as
+few-shot examples (the count itself is randomized on each run; which
+specific rows are drawn is reproducible via random_state).
+  - few_shot_df = df.sample(n=<random 60-70>, random_state=42)
   - create_few_shot_prompt(examples)
   - few_shot_prompt = create_few_shot_prompt(few_shot_df)
 """
+
+import random
 
 import pandas as pd
 
@@ -16,9 +20,11 @@ CSV_PATH = "california_housing_train.csv"
 
 df = pd.read_csv(CSV_PATH)
 
-# Randomly select exactly 70 rows from the dataset
+# Randomly select 60 to 70 rows from the dataset
+NUM_FEW_SHOT_EXAMPLES = random.randint(60, 70)
+
 few_shot_df = df.sample(
-    n=70,
+    n=NUM_FEW_SHOT_EXAMPLES,
     random_state=42
 )
 

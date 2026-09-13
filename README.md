@@ -6,12 +6,12 @@ A prompt-engineering homework assignment that predicts California housing prices
 
 Rather than training a regression model, this project teaches Gemini the relationship between housing attributes and price entirely through the prompt:
 
-1. **Exactly 70 random examples** are sampled from the California Housing dataset, each containing the house's attributes *and* its actual `median_house_value`.
-2. Those 70 examples are formatted into a single **few-shot prompt**.
+1. **60 to 70 random examples** (the exact count is randomized on each run) are sampled from the California Housing dataset, each containing the house's attributes *and* its actual `median_house_value`.
+2. Those examples are formatted into a single **few-shot prompt**.
 3. A **new house** (with unknown price) is formatted into its own prompt asking for a prediction.
 4. The few-shot prompt and the new-house prompt are concatenated into one **final prompt**.
 5. The final prompt is sent to **Gemini 2.5 Flash** via **LangChain's Google GenAI integration**.
-6. Gemini responds with its predicted `median_house_value`, based purely on the pattern it inferred from the 70 examples.
+6. Gemini responds with its predicted `median_house_value`, based purely on the pattern it inferred from the examples.
 
 This is the core idea of few-shot prompting: instead of fine-tuning a model, you demonstrate the task with examples directly inside the prompt.
 
@@ -25,7 +25,7 @@ This is the core idea of few-shot prompting: instead of fine-tuning a model, you
 
 | File | Purpose |
 |---|---|
-| `generate_few_shot_prompt.py` | Loads the CSV, samples exactly 70 rows (`df.sample(n=70, random_state=42)`), and builds `few_shot_prompt` via `create_few_shot_prompt()` |
+| `generate_few_shot_prompt.py` | Loads the CSV, samples 60 to 70 rows (`df.sample(n=random.randint(60, 70), random_state=42)`), and builds `few_shot_prompt` via `create_few_shot_prompt()` |
 | `predict_house_value.py` | Loads the Gemini API key, builds the new-house prompt via `create_new_house_prompt()`, combines it with `few_shot_prompt` into `final_prompt`, and sends it to Gemini 2.5 Flash for a prediction |
 | `california_housing_train.csv` | The dataset both scripts read from |
 | `.env.local.example` | Template for your API key — copy to `.env.local` |
@@ -58,7 +58,7 @@ pip install pandas langchain-google-genai python-dotenv
 python generate_few_shot_prompt.py
 ```
 
-This prints how many examples were selected (70) and a preview of the generated prompt.
+This prints how many examples were selected (a random count between 60 and 70) and a preview of the generated prompt.
 
 **2. Run a prediction:**
 
@@ -77,7 +77,7 @@ python predict_house_value.py --interactive
 ## Example Prediction Output
 
 ```
-Using 70 few-shot examples from california_housing_train.csv
+Using 64 few-shot examples from california_housing_train.csv
 
 Predicted Home Price: $342,150.00
 ```
@@ -87,7 +87,7 @@ Predicted Home Price: $342,150.00
 ## How the Prompt Engineering Works
 
 ```python
-few_shot_prompt = create_few_shot_prompt(few_shot_df)      # 70 labeled examples
+few_shot_prompt = create_few_shot_prompt(few_shot_df)      # 60-70 labeled examples
 new_house_prompt = create_new_house_prompt(new_house)       # the house to predict
 final_prompt = few_shot_prompt + new_house_prompt            # combined prompt sent to Gemini
 
@@ -95,4 +95,4 @@ response = model.invoke(final_prompt)
 price = float(response.content[0]["text"])
 ```
 
-`few_shot_df` always contains exactly 70 rows, selected with `df.sample(n=70, random_state=42)` — never a random range.
+`few_shot_df` contains a randomly chosen number of rows between 60 and 70 on each run, via `df.sample(n=random.randint(60, 70), random_state=42)`.
